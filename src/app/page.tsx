@@ -1,103 +1,160 @@
+"use client";
+
+import ImageSlider from "@/components/ImageSlider";
+import Sidebar from "@/components/Sidebar";
+import { useState, useEffect } from "react";
+import { MenuButton } from "@/components/MenuButton";
+import Story from "@/components/Story";
+import Tidbits from "@/components/Tidbits";
+import Hotels from "@/components/Hotels";
+import Registry from "@/components/Registry";
+import QandA from "@/components/QandA";
 import Image from "next/image";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [countdown, setCountdown] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [showArrow, setShowArrow] = useState(true);
+
+  useEffect(() => {
+    // Hide arrow after interaction
+    const alreadyViewed = sessionStorage.getItem("arrowDismissed");
+    if (alreadyViewed) {
+      setShowArrow(false);
+    }
+  }, []);
+
+  const handleScroll = () => {
+    window.scrollBy({
+      top: 600, // adjust this value to how far down you want to scroll
+      behavior: "smooth",
+    });
+    setShowArrow(false);
+    sessionStorage.setItem("arrowDismissed", "true");
+  };
+
+  useEffect(() => {
+    const targetDate = new Date("2025-10-24T00:00:00");
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const difference = targetDate.getTime() - now.getTime();
+
+      if (difference <= 0) {
+        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / (1000 * 60)) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+
+      setCountdown({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown(); // initialize immediately
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex flex-col lg:flex-row h-screen lg:overflow-hidden">
+      {/* Left Panel */}
+      <div className="relative w-full lg:w-3/5 lg:fixed lg:h-full z-10 min-h-[80vh]">
+        <ImageSlider />
+        <div className="absolute top-6 left-4 z-20">
+          <MenuButton onClick={() => setSidebarOpen(true)} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* Right Panel */}
+      <div className="w-full lg:ml-[60%] lg:w-2/5 h-screen lg:overflow-y-auto px-6 py-10">
+        <div className="md:max-w-[500px] w-full mx-auto text-center">
+          <div className="relative rounded-t-full bg-[#994610] h-[700px] text-white py-10 flex flex-col items-center text-center">
+            <div className="absolute">
+              <Image
+                src="/images/sun.png"
+                alt="sun"
+                width={120}
+                height={120}
+                className="object-contain"
+              />
+            </div>
+
+            <div className="mt-15 w-full">
+              <div className="text-[2rem] mt-8 header">Friday</div>
+              <h2 className="text-[1.8rem] header">October 24, 2025</h2>
+              <p className="mt-2 text-[1.8rem] header">Ibadan, Oyo, Nigeria</p>
+              <p className="mt-4 tracking-widest font-semibold">
+                {countdown.days} DAYS {countdown.hours} HRS {countdown.minutes}{" "}
+                MINS
+              </p>
+              <a
+                href="https://withjoy.com/bolaji-and-oyinda/rsvp"
+                target="_blank"
+              >
+                <button className="mt-10 px-6 py-2 border-2 cursor-pointer border-white rounded-full">
+                  RSVP
+                </button>
+              </a>
+            </div>
+
+            {/* Animated arrow */}
+            {showArrow && (
+              <button
+                onClick={handleScroll}
+                className="absolute bottom-12 flex flex-col items-center text-white animate-bounce"
+              >
+                <span className="text-sm mb-1">View Details</span>
+                <svg
+                  className="w-12 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <Story />
+        <Tidbits />
+        <Hotels
+          name="Golden Tulip Ibadan"
+          distance="3.9 miles away"
+          imageUrl="/images/hotel.webp"
+          externalLink="https://withjoy.com/bolaji-and-oyinda/accommodation-place/07e921a6-7785-4e5d-9276-8f984d50fcf6"
+          index={1}
+        />
+        <div className="relative h-[600px] w-full lg:hidden block">
+          <Image src="/images/03.jpg" alt="image" fill objectFit="cover" />
+        </div>
+        <Registry />
+
+        <div className="relative h-[600px] w-full lg:hidden block">
+          <Image src="/images/04.jpg" alt="image" fill objectFit="cover" />
+        </div>
+
+        <QandA />
+      </div>
+
+      {/* Sidebar */}
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }
